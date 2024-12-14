@@ -1,0 +1,38 @@
+.menu-options-container {
+  width: 100vw; /* Ocupa el ancho completo de la ventana */
+  height: 100vh; /* Ocupa el alto completo de la ventana */
+  display: flex; /* Para alinear las opciones */
+  justify-content: center; /* Centra las tarjetas horizontalmente */
+  align-items: center; /* Centra las tarjetas verticalmente */
+  flex-wrap: wrap; /* Permite que las tarjetas salten de línea si es necesario */
+  background-color: #000; /* Fondo oscuro */
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 100% 0, rgba(255, 0, 0, 0.1) 0%, transparent 50%);
+  overflow: hidden; /* Asegura que nada se desborde */
+}
+
+.hover-card {
+  margin: 20px; /* Espaciado entre tarjetas */
+  padding: 20px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+}
+
+.hover-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 30px rgba(255, 0, 0, 0.6);
+}
+
+.neon-text {
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-shadow: 
+    0 0 5px #ff0000,
+    0 0 10px #ff0000,
+    0 0 15px #ff0000,
+    0 0 20px #ff0000;
+  color: #ffffff;
+  text-align: center;
+}

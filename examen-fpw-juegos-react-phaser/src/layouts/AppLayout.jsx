@@ -5,7 +5,7 @@ export default function AppLayout({ children }) {
   return (
     <div className="app-layout">
       <header>
-        <h1>Mi Aplicación JS</h1>
+      <h1 className="text-center">Mi Aplicación</h1>
       </header>
       <main>{children}</main>
       <Footer />

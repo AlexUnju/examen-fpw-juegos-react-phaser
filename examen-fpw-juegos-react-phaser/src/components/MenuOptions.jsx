@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 // Importa los estilos personalizados
 import '../styles/menuStyles.css'; // Asegúrate de que la ruta sea correcta
+import { Link } from 'react-router-dom'; // Importa el Link para navegar
 
 /** 
  * Renderiza dos tarjetas con enlaces que contienen una imagen, título y botón de exploración
@@ -34,12 +35,14 @@ export default function MenuOptions() {
                 alt="tank game"
               />
               {/* Título del enlace */}
-              <h3 className="card-title text-danger">Enlace 1 JS</h3>
+              <h3 className="card-title text-danger">Juego Tanque PHASER JS</h3>
               {/* Botón para explorar el enlace */}
-              <button className="btn btn-outline-danger mt-3 neon-btn">
-                <i className="bi bi-arrow-right-circle me-2"></i>
-                Explorar
-              </button>
+              <Link to="/juego"> {/* Usamos Link en lugar de un botón tradicional */}
+                <button className="btn btn-outline-danger mt-3 neon-btn">
+                  <i className="bi bi-arrow-right-circle me-2"></i>
+                  Explorar
+                </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -59,10 +62,10 @@ export default function MenuOptions() {
               <img 
                 src="https://hamradio.my/wp-content/uploads/2024/06/q6hgjkv5yy4ilmgzpa1p.jpg" 
                 className="card-img mb-3 rounded" 
-                alt="JavaScript Development"
+                alt="LABERINTO REACT JS"
               />
               {/* Título del enlace */}
-              <h3 className="card-title text-danger">Enlace 2 JS</h3>
+              <h3 className="card-title text-danger">Laberinto REACT JS</h3>
               {/* Botón para explorar el enlace */}
               <button className="btn btn-outline-danger mt-3 neon-btn">
                 <i className="bi bi-arrow-right-circle me-2"></i>

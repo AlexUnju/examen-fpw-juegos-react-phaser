@@ -37,7 +37,6 @@ class Scene extends Phaser.Scene {
     // Crear Helicóptero con tamaño específico
     this.helicopter = new Helicopter(this, 100, 100);
     this.helicopter.setDisplaySize(ConfigUtils.displaySize.helicopter.width, ConfigUtils.displaySize.helicopter.height);
-    this.helicopter.body.setAllowGravity(false); // Deshabilitar gravedad para el helicóptero
 
     // Añadir enemigo a un grupo para manejar colisiones
     this.enemies = this.physics.add.group();
@@ -173,6 +172,22 @@ class Scene extends Phaser.Scene {
     }
   }
 
+
+  handlePlayerCollision(player, enemy) {
+    // Si el enemigo es un helicóptero, no lo destruyas
+    if (enemy instanceof Helicopter) {
+      // Si el enemigo es un helicóptero, solo dañar al jugador
+      player.damage(1);
+      console.log('Jugador recibe daño por colisión con helicóptero');
+    } else {
+      // Si el enemigo no es un helicóptero, procedemos con la destrucción habitual
+      player.damage(1);
+      if (enemy && !enemy.scene.isDestroyed) {
+        enemy.destroy();
+      }
+    }
+  }
+  
   handleHelicopterBulletCollision(bullet, helicopter) {
     console.log('Colisión con la bala en el helicóptero');
 
@@ -194,10 +209,7 @@ class Scene extends Phaser.Scene {
 
   handlePlayerHelicopterCollision(player, helicopter) {
     player.damage(2);
-
-    helicopter.damage(100); // Asumimos que esto destruirá el helicóptero
-
-    console.log('Helicóptero destruido por colisión con el jugador.');
+    console.log('Player recibe daño por colisión con helicóptero');
   }
 
   handlePlayerBombCollision(player, bomb) {

@@ -31,7 +31,7 @@ const JuegoPhaser = () => {
     };
   }, []);
 
-  return <div id="game-container" style={{ width: '800px', height: '600px', margin: '0 auto' }} />;
+  return <div id="game-container" style={{ width: '1000px', height: '800px', margin: '0 auto' }} />;
 };
 
 export default JuegoPhaser;

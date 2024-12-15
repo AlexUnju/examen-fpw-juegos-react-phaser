@@ -1,5 +1,3 @@
-import Phaser from 'phaser';
-
 class Helicopter extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, 'helicopter');
@@ -24,7 +22,7 @@ class Helicopter extends Phaser.Physics.Arcade.Sprite {
 
     // Timer que lanza bombas cada 2 segundos
     this.bombTimer = this.scene.time.addEvent({
-      delay: 2000,
+      delay: 5000,
       callback: this.dropBomb,
       callbackScope: this,  // Garantiza que 'this' dentro de 'dropBomb' sea el Helicopter
       loop: true
@@ -49,7 +47,7 @@ class Helicopter extends Phaser.Physics.Arcade.Sprite {
 
   dropBomb() {
     if (this.isDestroyed) {
-      return;
+      return; // Si el helicóptero ha sido destruido, no hacer nada
     }
 
     const bomb = this.bombs.get(this.x, this.y + 20);
@@ -64,13 +62,18 @@ class Helicopter extends Phaser.Physics.Arcade.Sprite {
       bomb.setCollideWorldBounds(true);
 
       // Usamos un callback adecuado para eliminar la bomba
-      this.scene.time.delayedCall(4000, this.destroyBomb, [bomb], this);  // Se pasa 'bomb' como argumento
+      if (this.scene && !this.isDestroyed) {
+        this.scene.time.delayedCall(4000, this.destroyBomb, [bomb], this);  // Se pasa 'bomb' como argumento
+      }
     }
   }
 
   destroyBomb(bomb) {
-    // Aseguramos que solo se destruye si no está destruido el helicóptero
-    if (this.isDestroyed && bomb) {
+    if (this.isDestroyed) {
+      return;  // No destruir la bomba si el helicóptero ya está destruido
+    }
+
+    if (bomb) {
       bomb.destroy();
     }
   }
@@ -84,7 +87,11 @@ class Helicopter extends Phaser.Physics.Arcade.Sprite {
 
       if (this.bombTimer) {
         this.bombTimer.remove();  // Detenemos el temporizador de bombas
+        this.bombTimer = null;  // Eliminamos la referencia al temporizador
       }
+
+      // Eliminar todas las bombas que hayan sido lanzadas
+      this.bombs.clear(true, true);
     }
   }
 

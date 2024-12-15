@@ -51,9 +51,6 @@ class Bomb extends Phaser.Physics.Arcade.Sprite {
     this.setBounce(1); // Añadir rebote
   }
 
-  update() {
-    // Aquí podrías agregar más lógica para las bombas si lo necesitas
-  }
 }
 
 export default Soldier;

@@ -46,13 +46,14 @@ class Scene extends Phaser.Scene {
     this.enemy.setDisplaySize(ConfigUtils.displaySize.enemy.width, ConfigUtils.displaySize.enemy.height);
 
     // Crear Helicóptero con tamaño específico
-    this.helicopter = new Helicopter(this, 100, 100);
+    this.helicopter = new Helicopter(this, 50, 100);
     this.helicopter.setDisplaySize(ConfigUtils.displaySize.helicopter.width, ConfigUtils.displaySize.helicopter.height);
 
     // Añadir enemigo a un grupo para manejar colisiones
     this.enemies = this.physics.add.group();
     this.enemies.add(this.enemy);
     this.enemies.add(this.helicopter);
+    this.enemies.add
 
     // Inicializa el grupo de soldados
     this.soldiers = this.physics.add.group();
@@ -76,6 +77,10 @@ class Scene extends Phaser.Scene {
     this.physics.add.existing(ground, true);
     this.physics.add.collider(this.player, ground);
     this.physics.add.collider(this.enemies, ground);
+    // Agregar colisión del Boss con el suelo
+    if (this.boss) {
+    this.physics.add.collider(this.boss, ground);
+    }
 
     // Crear plataformas con tamaño específico
     this.platforms = this.physics.add.staticGroup();
@@ -170,15 +175,46 @@ class Scene extends Phaser.Scene {
       this.boss.update(time);
       this.updateBossHealthBar();
     }
+
+      // Asegurar que el boss esté tocando el suelo
+  if (this.boss) {
+    // Posicionar el boss justo por encima del suelo, cerca del jugador
+    this.boss.y = Math.max(this.boss.y, 450);  // Ajustar 450 según el nivel de tu suelo
+  }
+
+    // Si el boss existe, actualizamos su barra de salud
+    if (this.boss) {
+      this.boss.update(time);
+      this.updateBossHealthBar();
+    }
   }
 
 
   spawnBoss() {
     // Crear el boss cuando no haya enemigos
     this.boss = new Boss(this, 400, 150);
+
+    // Configurar tamaño del Boss
     this.boss.setDisplaySize(ConfigUtils.displaySize.enemy.width, ConfigUtils.displaySize.enemy.height);
+  
+    // Añadir el Boss a la escena
+    this.physics.add.existing(this.boss);
+    
+    // Colisión con el jugador
+    this.physics.add.collider(this.player, this.boss, this.handlePlayerCollision, null, this);
+
+    // Colisión con las balas del jugador
+    this.physics.add.collider(this.player.bullets, this.boss, this.handleBulletCollision, null, this);  
+
+  // Habilitar colisión con el suelo
+  this.physics.add.collider(this.boss, this.physics.world.staticBodies); // Suelo estático
+
+  // Añadir el Boss al grupo de enemigos
+  this.enemies.add(this.boss);
+
+     // Configurar barra de salud del Boss
     this.bossHealthBar.clear();
-    this.bossHealthBar.fillRect(20, 20, 200, 10);  // Crear la barra de salud del boss
+    this.bossHealthBar.fillRect(20, 20, 200, 10);
   }
 
   updateBossHealthBar() {

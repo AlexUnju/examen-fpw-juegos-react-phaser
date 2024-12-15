@@ -30,20 +30,26 @@ class Helicopter extends Phaser.Physics.Arcade.Sprite {
       loop: true
     });
 
+    // Variable para rastrear la dirección previa
+    this.previousX = x;
+
+    // Tween que mueve al helicóptero de lado a lado
     this.scene.tweens.add({
       targets: this,
       x: 700,
       duration: 6000,
       ease: 'Linear',
       yoyo: true,
-      repeat: -1
+      repeat: -1,
+      onUpdate: () => {
+        this.updateDirection();
+      }
     });
   }
 
   dropBomb() {
-    // Verificar si el helicóptero ha sido destruido
     if (this.isDestroyed) {
-      return; // Si el helicóptero está destruido, no lanza más bombas
+      return;
     }
 
     const bomb = this.bombs.get(this.x, this.y + 20);
@@ -58,8 +64,8 @@ class Helicopter extends Phaser.Physics.Arcade.Sprite {
       bomb.setCollideWorldBounds(true);
 
       this.scene.time.delayedCall(4000, () => {
-      });        
-      bomb.destroy();
+        bomb.destroy();
+      });
     }
   }
 
@@ -67,14 +73,25 @@ class Helicopter extends Phaser.Physics.Arcade.Sprite {
     this.health -= amount;
     if (this.health <= 0) {
       this.health = 0;
-      this.isDestroyed = true; // Marcar como destruido
+      this.isDestroyed = true;
       this.destroy();
-      
-      // Detener el temporizador de bombas cuando el helicóptero sea destruido
+
       if (this.bombTimer) {
         this.bombTimer.remove();
       }
     }
+  }
+
+  updateDirection() {
+    // Cambiar la orientación basándose en el cambio de posición
+    if (this.x > this.previousX) {
+      this.setFlipX(true); // Mirando hacia la derecha
+    } else if (this.x < this.previousX) {
+      this.setFlipX(false); // Mirando hacia la izquierda
+    }
+
+    // Actualizar el valor de `previousX`
+    this.previousX = this.x;
   }
 }
 

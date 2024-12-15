@@ -9,7 +9,7 @@ const ConfigUtils = {
     background: { width: 800, height: 600 }, // Fondo
     enemy: { width: 100, height: 70 },     // Tanque enemigo
     soldier: { width: 70, height: 70 },    // Soldados
-    helicopter: { width: 150, height: 150 }, // Helicóptero
+    helicopter: { width: 150, height: 100 }, // Helicóptero
     platform: { width: 90, height: 50 }    // Plataforma
   }
 };

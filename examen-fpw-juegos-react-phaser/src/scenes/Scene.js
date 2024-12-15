@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import Player from '../entities/player';
 import Enemy from '../entities/enemy';
 import Helicopter from '../entities/helicopter';
+import Soldier from '../entities/Soldier';
 
 class Scene extends Phaser.Scene {
   constructor() {
@@ -33,6 +34,16 @@ class Scene extends Phaser.Scene {
     this.enemies = this.physics.add.group();
     this.enemies.add(this.enemy);
 
+    // Inicializa el grupo de soldados
+    this.soldiers = this.physics.add.group();
+
+    // Crear soldados
+    this.soldiers = this.physics.add.group();
+    for (let i = 0; i < 5; i++) {
+      const soldier = new Soldier(this, 600 + i * 80, 540);
+      this.soldiers.add(soldier);
+    }
+
     // Suelo
     const ground = this.add.rectangle(400, 580, 800, 40, 0x00ff00);
     this.physics.add.existing(ground, true);
@@ -60,11 +71,20 @@ class Scene extends Phaser.Scene {
     // suelo helicopter bombs collision
     this.physics.add.collider(this.helicopter.bombs, ground);
 
+    // suelo soldados collision
+    this.physics.add.collider(this.soldiers, ground);
+
+    // Detección de colisiones entre el jugador y los soldados
+    this.physics.add.collider(this.player, this.soldiers, this.handlePlayerCollision, null, this);
+
+    // Detección de colisiones entre las balas del jugador y los soldados
+    this.physics.add.collider(this.player.bullets, this.soldiers, this.handleBulletCollision, null, this);
+
     // HUD
     this.healthText = this.add.text(16, 16, 'Health: 100', { fontSize: '18px', fill: '#ffffff' });
   }
 
-  update(time) {
+  update(time, delta) {
     // Actualizar jugador
     this.player.update(time);
 
@@ -77,7 +97,13 @@ class Scene extends Phaser.Scene {
 
     // Actualizar HUD
     this.healthText.setText(`Health: ${this.player.health}`);
-  }
+
+    // Actualizar soldados
+    this.soldiers.children.iterate((soldier) => {
+      if (soldier) {
+        soldier.update(this.player); // Pasamos el jugador como argumento al método 'update'
+      }
+    });  }
 
   handlePlayerCollision(player, enemy) {
     // Reducir la vida del jugador al colisionar con un enemigo

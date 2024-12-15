@@ -19,9 +19,9 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.health = 40;
 
-    // Temporizador para disparar cada 1 segundo
+    // Temporizador para disparar cada X segundo
     this.fireTimer = this.scene.time.addEvent({
-      delay: 1000,
+      delay: 5000,
       callback: this.fire,
       callbackScope: this,
       loop: true,

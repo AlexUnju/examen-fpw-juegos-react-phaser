@@ -30,7 +30,7 @@ class Helicopter extends Phaser.Physics.Arcade.Sprite {
     this.scene.tweens.add({
       targets: this,
       x: 700,
-      duration: 4000,
+      duration: 6000,
       ease: 'Linear',
       yoyo: true,
       repeat: -1
@@ -48,7 +48,7 @@ class Helicopter extends Phaser.Physics.Arcade.Sprite {
       bomb.setCollideWorldBounds(true);
       
       // Destruir la bomba después de 5 segundos
-      this.scene.time.delayedCall(5000, () => {
+      this.scene.time.delayedCall(4000, () => {
         bomb.destroy();
       });
     }

@@ -26,7 +26,7 @@ class Helicopter extends Phaser.Physics.Arcade.Sprite {
     this.bombTimer = this.scene.time.addEvent({
       delay: 2000,
       callback: this.dropBomb,
-      callbackScope: this,
+      callbackScope: this,  // Garantiza que 'this' dentro de 'dropBomb' sea el Helicopter
       loop: true
     });
 
@@ -63,9 +63,15 @@ class Helicopter extends Phaser.Physics.Arcade.Sprite {
       bomb.setBounce(0.8);
       bomb.setCollideWorldBounds(true);
 
-      this.scene.time.delayedCall(4000, () => {
-        bomb.destroy();
-      });
+      // Usamos un callback adecuado para eliminar la bomba
+      this.scene.time.delayedCall(4000, this.destroyBomb, [bomb], this);  // Se pasa 'bomb' como argumento
+    }
+  }
+
+  destroyBomb(bomb) {
+    // Aseguramos que solo se destruye si no está destruido el helicóptero
+    if (this.isDestroyed && bomb) {
+      bomb.destroy();
     }
   }
 
@@ -77,7 +83,7 @@ class Helicopter extends Phaser.Physics.Arcade.Sprite {
       this.destroy();
 
       if (this.bombTimer) {
-        this.bombTimer.remove();
+        this.bombTimer.remove();  // Detenemos el temporizador de bombas
       }
     }
   }

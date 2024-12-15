@@ -19,7 +19,6 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.health = 40;
 
-    // Temporizador para disparar cada X segundo
     this.fireTimer = this.scene.time.addEvent({
       delay: 5000,
       callback: this.fire,
@@ -48,17 +47,20 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   fire() {
-    if (this.isDestroyed || !this.scene) return; // Evitar disparar si el enemigo está destruido o no hay escena
+    if (this.isDestroyed || !this.scene) return;
 
     const bullet = this.bullets.get(this.x, this.y);
     if (bullet) {
+      bullet.setTexture('bullet');
+      bullet.setScale(0.1);
+      bullet.setSize(2, 1);
+      bullet.setOffset(5, 5);
       bullet.setActive(true);
       bullet.setVisible(true);
       bullet.body.enable = true;
       bullet.body.setAllowGravity(false);
-      bullet.setVelocityX(-200); // Las balas se mueven hacia la izquierda
+      bullet.setVelocityX(-200);
 
-      // Destruir la bala después de 3 segundos, si el enemigo y la escena aún existen
       if (this.scene) {
         this.scene.time.delayedCall(3000, () => {
           if (bullet && bullet.scene) {
@@ -77,31 +79,28 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (this.health <= 0) {
       this.isDestroyed = true;
 
-      // Detener el temporizador antes de destruir
       if (this.fireTimer) {
         this.fireTimer.remove();
       }
 
-      // Desactivar y destruir todas las balas activas
       this.bullets.children.each((bullet) => {
         if (bullet) {
           bullet.setActive(false);
           bullet.setVisible(false);
-          bullet.body.enable = false; // Desactivar cuerpo físico
+          bullet.body.enable = false;
           bullet.destroy();
         }
       });
 
-      // Limpiar el grupo de balas
       this.bullets.clear(true, true);
 
-      // Asegurarse de que no haya referencias a la escena antes de destruir
       this.scene.time.delayedCall(0, () => {
         this.destroy();
-        this.scene = null; // Eliminar referencia a la escena
+        this.scene = null;
       });
     }
   }
 }
 
 export default Enemy;
+

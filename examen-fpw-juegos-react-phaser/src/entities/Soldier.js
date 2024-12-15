@@ -7,9 +7,10 @@ class Soldier extends Phaser.Physics.Arcade.Sprite {
     this.scene.add.existing(this);
     this.scene.physics.add.existing(this);
 
-    this.setCollideWorldBounds(true);
-    this.setBounce(0.2);
-    this.setVelocityX(-30); // Movimiento constante hacia la izquierda
+    this.setCollideWorldBounds(true); // Hacer que el soldado no salga del mapa
+    this.setBounce(0.2); // Agregar un pequeño rebote para un efecto visual
+    this.setVelocityX(-30); // Mover inicialmente hacia la izquierda
+    this.direction = -1; // Indicar que el soldado se mueve hacia la izquierda
 
     this.bullets = this.scene.physics.add.group({
       classType: Phaser.Physics.Arcade.Image,
@@ -17,7 +18,7 @@ class Soldier extends Phaser.Physics.Arcade.Sprite {
       runChildUpdate: true
     });
 
-    this.health = 20;
+    this.health = 10;
 
     // Disparo aleatorio por soldado
     this.startFireTimer();
@@ -40,15 +41,17 @@ class Soldier extends Phaser.Physics.Arcade.Sprite {
       return; // Si el soldado está destruido, no hacer nada más en update
     }
 
-    // El soldado se mueve solo hacia la izquierda a velocidad constante
-    this.setVelocityX(-30); // Movimiento hacia la izquierda
-
-    // Verificar colisiones o comportamiento adicional si es necesario
+    // Verificar colisiones con los bordes
     if (this.body.touching.right || this.body.blocked.right) {
-      this.setVelocityX(-30); // Si toca el borde derecho, sigue moviéndose a la izquierda
+      this.direction = -1; // Si toca el borde derecho, volver a moverse hacia la izquierda
+      this.setVelocityX(-30); // Cambiar la dirección del movimiento
     } else if (this.body.touching.left || this.body.blocked.left) {
-      this.setVelocityX(30); // Si toca el borde izquierdo, invierte el movimiento
+      this.direction = 1; // Si toca el borde izquierdo, moverse hacia la derecha
+      this.setVelocityX(30); // Cambiar la dirección del movimiento
     }
+
+    // Mover constantemente en la dirección establecida
+    this.setVelocityX(this.direction * 30); // Asegurarse de que la dirección esté controlada por la variable `direction`
   }
 
   fire() {
@@ -63,7 +66,7 @@ class Soldier extends Phaser.Physics.Arcade.Sprite {
       bullet.setVisible(true);
       bullet.body.enable = true;
       bullet.body.setAllowGravity(false); // Desactivar la gravedad en el proyectil
-      bullet.setVelocityX(-150); // Establecer velocidad en X para que el proyectil se mueva hacia la izquierda
+      bullet.setVelocityX(this.direction * 150); // El proyectil se mueve hacia la dirección opuesta al soldado
     }
 
     // Reiniciar el temporizador con un nuevo tiempo aleatorio entre 7 y 11 segundos

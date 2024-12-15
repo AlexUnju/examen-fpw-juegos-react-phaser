@@ -15,6 +15,7 @@ class Scene extends Phaser.Scene {
     this.load.image('bullet', 'assets/bullet.png');
     this.load.image('background', 'assets/background.png');
     this.load.image('enemy', 'assets/enemy.png');
+    this.load.image('platform', 'assets/platform.png'); // Cargar imagen de la plataforma
   }
 
   create() {
@@ -27,7 +28,7 @@ class Scene extends Phaser.Scene {
     // Crear un enemigo
     this.enemy = new Enemy(this, 600, 450);
 
-    // crear Helicoptero
+    // Crear Helicoptero
     this.helicopter = new Helicopter(this, 100, 100);
 
     // Añadir enemigo a un grupo para manejar colisiones
@@ -49,6 +50,16 @@ class Scene extends Phaser.Scene {
     this.physics.add.existing(ground, true);
     this.physics.add.collider(this.player, ground);
     this.physics.add.collider(this.enemies, ground);
+
+    // Crear plataformas con colisión
+    this.platforms = this.physics.add.staticGroup();
+    // Crear dos plataformas simples
+    this.platforms.create(200, 420, 'platform').setScale(2).refreshBody(); // Plataforma 1
+    this.platforms.create(300, 300, 'platform').setScale(2).refreshBody(); // Plataforma 2
+    this.platforms.create(600, 300, 'platform').setScale(2).refreshBody(); // Plataforma 3
+
+    // Colisiones entre el jugador y las plataformas
+    this.physics.add.collider(this.player, this.platforms);
 
     // Manejar colisión entre el jugador y los enemigos
     this.physics.add.collider(this.player, this.enemies, this.handlePlayerCollision, null, this);
@@ -103,7 +114,8 @@ class Scene extends Phaser.Scene {
       if (soldier) {
         soldier.update(this.player); // Pasamos el jugador como argumento al método 'update'
       }
-    });  }
+    });
+  }
 
   handlePlayerCollision(player, enemy) {
     // Reducir la vida del jugador al colisionar con un enemigo
@@ -132,4 +144,5 @@ class Scene extends Phaser.Scene {
     }
   }
 }
+
 export default Scene;

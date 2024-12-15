@@ -60,6 +60,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
       if (this.health <= 0) {
         this.health = 0;
         this.destroy();
+        console.log("Game Over");
       } else {
         this.invulnerable = true;
         this.scene.time.delayedCall(this.invulnerabilityTime, () => {

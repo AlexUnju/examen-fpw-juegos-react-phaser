@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import Player from '../entities/player';
 import Enemy from '../entities/enemy';
+import Helicopter from '../entities/helicopter';
 
 class Scene extends Phaser.Scene {
   constructor() {
@@ -25,6 +26,9 @@ class Scene extends Phaser.Scene {
     // Crear un enemigo
     this.enemy = new Enemy(this, 600, 450);
 
+    // crear Helicoptero
+    this.helicopter = new Helicopter(this, 100, 100);
+
     // Añadir enemigo a un grupo para manejar colisiones
     this.enemies = this.physics.add.group();
     this.enemies.add(this.enemy);
@@ -44,6 +48,19 @@ class Scene extends Phaser.Scene {
     // Detección de colisiones entre balas del enemigo y el jugador
     this.physics.add.overlap(this.enemy.bullets, this.player, this.handleEnemyBulletCollision, null, this);
 
+    // Detección de colisiones entre balas del jugador y el helicoptero
+    this.physics.add.collider(this.player.bullets, this.helicopter, this.handleBulletCollision, null, this);
+
+    // Helicopter bombs collision
+    this.physics.add.collider(this.player, this.helicopter.bombs, this.handlePlayerCollision, null, this);
+    this.physics.add.collider(this.helicopter.bombs, this.staticTanks);
+    this.physics.add.collider(this.helicopter.bombs, this.enemies);
+    this.physics.add.collider(this.helicopter.bombs, this.soldiers);
+
+    // suelo helicopter bombs collision
+    this.physics.add.collider(this.helicopter.bombs, ground);
+
+    // HUD
     this.healthText = this.add.text(16, 16, 'Health: 100', { fontSize: '18px', fill: '#ffffff' });
   }
 
@@ -76,7 +93,7 @@ class Scene extends Phaser.Scene {
     bullet.destroy(); // Destruir la bala
     player.damage(1); // Reducir 1 vida al jugador
   }
-  
+
   handleBulletCollision(bullet, enemy) {
     // Desactivar la bala después de la colisión
     bullet.setActive(false);
@@ -89,8 +106,4 @@ class Scene extends Phaser.Scene {
     }
   }
 }
-
-
-
-
 export default Scene;

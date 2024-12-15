@@ -3,6 +3,7 @@ import Player from '../entities/player';
 import Enemy from '../entities/enemy';
 import Helicopter from '../entities/helicopter';
 import Soldier from '../entities/Soldier';
+import Boss from '../entities/Boss';
 import ConfigUtils from '../utils/configUtils';
 
 class Scene extends Phaser.Scene {
@@ -20,6 +21,7 @@ class Scene extends Phaser.Scene {
     this.load.image('soldier', 'public/images/soldier.webp');
     this.load.image('bomb', 'public/images/bomb.png');
     this.load.image('bullet', 'public/images/bullet.webp');
+    this.load.image('boss', 'public/images/boss.png');
   }
 
   create() {
@@ -29,6 +31,15 @@ class Scene extends Phaser.Scene {
     // Crear el jugador con tamaño específico
     this.player = new Player(this, 100, 450);
     this.player.setDisplaySize(ConfigUtils.displaySize.tank.width, ConfigUtils.displaySize.tank.height);
+
+    // Agregar el jugador a la escena y permitir que dispare
+    this.physics.add.existing(this.player);
+
+    // Configurar el grupo de balas, sin un límite estricto
+    this.player.bullets = this.physics.add.group({
+      classType: Phaser.Physics.Arcade.Image,
+      runChildUpdate: true // Permite la actualización de las balas
+    });
 
     // Crear un enemigo con tamaño específico (tanque enemigo)
     this.enemy = new Enemy(this, 600, 450);
@@ -47,8 +58,15 @@ class Scene extends Phaser.Scene {
     this.soldiers = this.physics.add.group();
 
     // Crear soldados con tamaño específico
-    for (let i = 0; i < 5; i++) {
-      const soldier = new Soldier(this, 600 + i * 80, 440);
+    for (let i = 0; i < 2; i++) {
+      const soldier = new Soldier(this, 700 + i * 80, 440);
+      soldier.setDisplaySize(ConfigUtils.displaySize.soldier.width, ConfigUtils.displaySize.soldier.height);
+      this.soldiers.add(soldier);
+    }
+
+   // Crear soldados con tamaño específico
+    for (let i = 0; i < 2; i++) {
+      const soldier = new Soldier(this, 700 + i * 80, 440);
       soldier.setDisplaySize(ConfigUtils.displaySize.soldier.width, ConfigUtils.displaySize.soldier.height);
       this.soldiers.add(soldier);
     }
@@ -64,6 +82,9 @@ class Scene extends Phaser.Scene {
     this.platforms.create(200, 420, 'platform').setDisplaySize(ConfigUtils.displaySize.platform.width, ConfigUtils.displaySize.platform.height).refreshBody();
     this.platforms.create(300, 300, 'platform').setDisplaySize(ConfigUtils.displaySize.platform.width, ConfigUtils.displaySize.platform.height).refreshBody();
     this.platforms.create(600, 300, 'platform').setDisplaySize(ConfigUtils.displaySize.platform.width, ConfigUtils.displaySize.platform.height).refreshBody();
+
+    // Crear Boss si no hay enemigos
+    this.boss = null;
 
     // Colisiones entre el jugador y las plataformas
     this.physics.add.collider(this.player, this.platforms);
@@ -82,8 +103,6 @@ class Scene extends Phaser.Scene {
 
     // Colisión de bombas del helicóptero
     this.physics.add.collider(this.player, this.helicopter.bombs, this.handlePlayerBombCollision, null, this);
-    this.physics.add.collider(this.helicopter.bombs, this.enemies);
-    this.physics.add.collider(this.helicopter.bombs, this.soldiers);
 
     // Colisión de bombas del helicóptero con el suelo
     this.physics.add.collider(this.helicopter.bombs, ground);
@@ -103,6 +122,10 @@ class Scene extends Phaser.Scene {
     // HUD
     this.healthText = this.add.text(16, 16, 'Salud: 100', { fontSize: '18px', fill: '#ff0000' }); // Texto rojo para la salud
     this.enemyCountText = this.add.text(16, 40, `Enemigos vivos: ${this.getEnemyCount()}`, { fontSize: '18px', fill: '#ffffff' });
+
+    // Barra de vida del boss
+    this.bossHealthBar = this.add.graphics();
+    this.bossHealthBar.fillStyle(0x00ff00, 1);  // Barra verde para el boss
   }
 
   update(time, delta) {
@@ -136,6 +159,34 @@ class Scene extends Phaser.Scene {
         soldier.update(this.player);
       }
     });
+
+    // Crear el boss si no hay enemigos vivos
+    if (this.getEnemyCount() === 0 && !this.boss) {
+      this.spawnBoss();
+    }
+
+    // Si el boss existe, actualizamos su barra de salud
+    if (this.boss) {
+      this.boss.update(time);
+      this.updateBossHealthBar();
+    }
+  }
+
+
+  spawnBoss() {
+    // Crear el boss cuando no haya enemigos
+    this.boss = new Boss(this, 400, 150);
+    this.boss.setDisplaySize(ConfigUtils.displaySize.enemy.width, ConfigUtils.displaySize.enemy.height);
+    this.bossHealthBar.clear();
+    this.bossHealthBar.fillRect(20, 20, 200, 10);  // Crear la barra de salud del boss
+  }
+
+  updateBossHealthBar() {
+    // Actualizar la barra de salud del boss
+    const healthPercent = this.boss.health / this.boss.maxHealth;
+    this.bossHealthBar.clear();
+    this.bossHealthBar.fillStyle(0x00ff00, 1);
+    this.bossHealthBar.fillRect(20, 20, 200 * healthPercent, 10);
   }
 
   handlePlayerCollision(player, enemy) {

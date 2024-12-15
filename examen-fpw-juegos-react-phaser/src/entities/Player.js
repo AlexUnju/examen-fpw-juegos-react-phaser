@@ -11,16 +11,17 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.setBounce(0.2);
     this.setDrag(500, 0);
 
-    this.bullets = this.scene.physics.add.group({
-      classType: Phaser.Physics.Arcade.Image,
-      maxSize: 10,
-      runChildUpdate: true
-    });
-
     this.health = 3;
     this.maxHealth = 3;
     this.invulnerable = false;
-    this.invulnerabilityTime = 1000;
+    this.invulnerabilityTime = 2000;
+
+    // Agrupación de balas para disparar
+    this.bullets = this.scene.physics.add.group({
+      classType: Phaser.Physics.Arcade.Image,
+      maxSize: 10, // Se puede ajustar este límite si se quiere
+      runChildUpdate: true
+    });
 
     this.cursors = this.scene.input.keyboard.createCursorKeys();
     this.fireKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -29,6 +30,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   update(time) {
+    // Movimiento del jugador
     if (this.cursors.left.isDown) {
       this.setVelocityX(-160);
       this.setFlipX(true); // Refleja la imagen hacia la izquierda
@@ -43,6 +45,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
       this.setVelocityY(-330);
     }
 
+    // Lógica de disparo (sin límite de munición)
     if (this.fireKey.isDown && time > this.lastFired) {
       const bullet = this.bullets.get(this.x, this.y - 20);
       if (bullet) {
@@ -75,7 +78,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.scene.tweens.add({
           targets: this,
           alpha: 0.5,
-          duration: 100,
+          duration: 599,
           ease: 'Linear',
           repeat: 5,
           yoyo: true,

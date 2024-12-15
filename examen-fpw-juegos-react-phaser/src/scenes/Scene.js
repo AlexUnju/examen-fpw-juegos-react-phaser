@@ -142,47 +142,77 @@ class Scene extends Phaser.Scene {
   }
   
   handleEnemyBulletCollision(player, bullet) {
+    console.log('Colisión con la bala del enemigo');
     bullet.destroy();
     player.damage(1);
   }
 
   handleBulletCollision(bullet, enemy) {
+    console.log('Colisión con la bala');
     bullet.setActive(false);
     bullet.setVisible(false);
     bullet.body.enable = false;
 
     if (enemy && enemy.damage) {
-      enemy.damage(20);
-
-      // Si el enemigo es el helicóptero y ha sido destruido
-      if (enemy === this.helicopter && enemy.health <= 0) {
-        // Destruir el helicóptero
-        enemy.destroy();
-        enemy.isDestroyed = true;
-
-        // Detener la generación de bombas
-        if (enemy.bombTimer) {
-          enemy.bombTimer.remove();
-        }
-
-        console.log('Helicóptero destruido por proyectil');
-      }
+      enemy.damage(2);
     }
   }
 
   handlePlayerHelicopterCollision(player, helicopter) {
     // Reducir la vida del jugador en 2 puntos
     player.damage(2);
-
+  
     // Destruir el helicóptero
     helicopter.destroy();
     helicopter.isDestroyed = true;
-
+  
     // Detener la generación de bombas
     if (helicopter.bombTimer) {
-      helicopter.bombTimer.remove();
+      helicopter.bombTimer.remove();  // Elimina el temporizador que genera bombas
     }
+  
+    // Detener o destruir las bombas activas del helicóptero
+    if (helicopter.bombs && helicopter.bombs.children.size > 0) {
+      // Destruir todas las bombas del helicóptero
+      helicopter.bombs.children.each(bomb => {
+        bomb.destroy();  // Esto destruye las bombas
+      });
+    }
+    console.log('Helicóptero destruido por colisión. Bombas detenidas.');
   }
+
+  handlePlayerBulletHelicopterCollision(bullet, helicopter) {
+    // Destruir la bala del jugador
+    bullet.setActive(false);
+    bullet.setVisible(false);
+    bullet.body.enable = false;
+  
+    // Reducir la vida del helicóptero
+    helicopter.damage(20); // Ajusta el valor según el daño que quieres hacer al helicóptero
+  
+    // Si el helicóptero es destruido
+    if (helicopter.health <= 0) {
+      // Destruir el helicóptero
+      helicopter.destroy();
+      helicopter.isDestroyed = true;
+  
+      // Detener la generación de bombas
+      if (helicopter.bombTimer) {
+        helicopter.bombTimer.remove();  // Elimina el temporizador que genera bombas
+      }
+  
+      // Detener o destruir las bombas activas del helicóptero
+      if (helicopter.bombs && helicopter.bombs.children.size > 0) {
+        // Destruir todas las bombas del helicóptero
+        helicopter.bombs.children.each(bomb => {
+          bomb.destroy();  // Esto destruye las bombas
+        });
+      }
+  
+      // Mensaje indicando que el helicóptero fue destruido por un proyectil
+      console.log('Helicóptero destruido por proyectil. Bombas detenidas.');
+    }
+  }  
 
   // Nueva función para manejar la colisión con las bombas de los soldados
   handlePlayerBombCollision(player, bomb) {
@@ -192,4 +222,3 @@ class Scene extends Phaser.Scene {
 }
 
 export default Scene;
-

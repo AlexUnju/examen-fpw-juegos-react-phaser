@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import Player from '../entities/player';
+import Enemy from '../entities/enemy';
 
 class Scene extends Phaser.Scene {
   constructor() {
@@ -7,34 +8,89 @@ class Scene extends Phaser.Scene {
   }
 
   preload() {
+    // Cargar imágenes de los recursos
     this.load.image('tank', 'assets/tank.png');
     this.load.image('bullet', 'assets/bullet.png');
     this.load.image('background', 'assets/background.png');
+    this.load.image('enemy', 'assets/enemy.png');
   }
 
   create() {
-    // fondo
+    // Añadir fondo
     this.add.image(400, 300, 'background');
 
-    // jugador
-    this.player = new Player(this, 3, 450);
+    // Crear el jugador
+    this.player = new Player(this, 100, 450);
+
+    // Crear un enemigo
+    this.enemy = new Enemy(this, 600, 450);
+
+    // Añadir enemigo a un grupo para manejar colisiones
+    this.enemies = this.physics.add.group();
+    this.enemies.add(this.enemy);
 
     // Suelo
     const ground = this.add.rectangle(400, 580, 800, 40, 0x00ff00);
     this.physics.add.existing(ground, true);
     this.physics.add.collider(this.player, ground);
+    this.physics.add.collider(this.enemies, ground);
 
-    // HUD
-    this.healthText = this.add.text(16, 16, 'Health: 3', { fontSize: '18px', fill: '#ffffff' });
+    // Manejar colisión entre el jugador y los enemigos
+    this.physics.add.collider(this.player, this.enemies, this.handlePlayerCollision, null, this);
+
+    // Manejar colisión entre las balas del jugador y los enemigos
+    this.physics.add.collider(this.player.bullets, this.enemies, this.handleBulletCollision, null, this);
+
+    // Detección de colisiones entre balas del enemigo y el jugador
+    this.physics.add.overlap(this.enemy.bullets, this.player, this.handleEnemyBulletCollision, null, this);
+
+    this.healthText = this.add.text(16, 16, 'Health: 100', { fontSize: '18px', fill: '#ffffff' });
   }
 
   update(time) {
-    // actualizar el jugador
+    // Actualizar jugador
     this.player.update(time);
 
-    // actualizar HUD
+    // Actualizar enemigos
+    this.enemies.children.iterate((enemy) => {
+      if (enemy) {
+        enemy.update(time);
+      }
+    });
+
+    // Actualizar HUD
     this.healthText.setText(`Health: ${this.player.health}`);
   }
+
+  handlePlayerCollision(player, enemy) {
+    // Reducir la vida del jugador al colisionar con un enemigo
+    player.damage(1); // Resta 1 vida al jugador
+  
+    // Verificar si el enemigo sigue existiendo antes de intentar destruirlo
+    if (enemy && !enemy.scene.isDestroyed) {
+      enemy.destroy(); // El enemigo desaparece
+    }
+  }
+  
+  handleEnemyBulletCollision(player, bullet) {
+    bullet.destroy(); // Destruir la bala
+    player.damage(1); // Reducir 1 vida al jugador
+  }
+  
+  handleBulletCollision(bullet, enemy) {
+    // Desactivar la bala después de la colisión
+    bullet.setActive(false);
+    bullet.setVisible(false);
+    bullet.body.enable = false;
+
+    // Reducir la vida del enemigo si existe y tiene el método damage
+    if (enemy && enemy.damage) {
+      enemy.damage(20);
+    }
+  }
 }
+
+
+
 
 export default Scene;
